@@ -1,0 +1,17 @@
+{
+    "name": "nucleuslabs/pdoplus",
+    "description": "PDO extensions",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mark Penner",
+            "email": "mpenner@nucleuslabs.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "PdoPlus\\": ["src/"]
+        },
+    }
+}
