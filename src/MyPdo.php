@@ -18,7 +18,7 @@ class MyPdo extends PdoPlus {
 
     public static $connectionCount = 0;
 
-    function __construct($host, $database_name=null, $username, $password, $options=[]) {
+    function __construct($host, $database_name=null, $username, $password, $options=[], $timezone=null) {
         $options = self::merge([
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -41,6 +41,14 @@ class MyPdo extends PdoPlus {
         }
 
         $dsn = 'mysql:'.implode(';',$dsn_filtered);
+
+        if(strlen($timezone)) {
+            $initCommand = (new Escaper())->format('SET SESSION time_zone=?', [$timezone]);
+            if(isset($options[PDO::MYSQL_ATTR_INIT_COMMAND])) {
+                $initCommand .= ';'.$options[PDO::MYSQL_ATTR_INIT_COMMAND];
+            }
+            $options[PDO::MYSQL_ATTR_INIT_COMMAND] = $initCommand;
+        }
 
         try {
             parent::__construct($dsn, $username, $password, $options);
