@@ -451,6 +451,7 @@ class MyPdo extends PdoPlus {
         if(is_null($value)) return 'NULL';
         elseif(is_bool($value)) return $value ? 'TRUE' : 'FALSE';
         elseif(is_int($value)||is_float($value)) return $value;
+        elseif(is_array($value)) return implode(',', array_map(array($this, 'quote'), $value));
         return parent::quote($value);
     }
 
