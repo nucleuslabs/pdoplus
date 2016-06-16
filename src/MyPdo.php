@@ -44,7 +44,7 @@ class MyPdo extends PdoPlus {
 
         if(strlen($timezone)) {
             $initCommand = (new Escaper())->format('SET SESSION time_zone=?', [$timezone]);
-            if(isset($options[PDO::MYSQL_ATTR_INIT_COMMAND])) {
+            if(!empty($options[PDO::MYSQL_ATTR_INIT_COMMAND])) {
                 $initCommand .= ';'.$options[PDO::MYSQL_ATTR_INIT_COMMAND];
             }
             $options[PDO::MYSQL_ATTR_INIT_COMMAND] = $initCommand;
@@ -77,15 +77,7 @@ class MyPdo extends PdoPlus {
      * @return MyPdo
      */
     public static function createFromDbVars(array $dbVars, array $options = []) {
-        if(!empty($dbVars['timezone'])) {
-            $initCommand = (new Escaper())->format('SET SESSION time_zone=?', [$dbVars['timezone']]);
-            if(!empty($options[PDO::MYSQL_ATTR_INIT_COMMAND])) {
-                $initCommand .= ';'.$options[PDO::MYSQL_ATTR_INIT_COMMAND];
-            }
-            $options[PDO::MYSQL_ATTR_INIT_COMMAND] = $initCommand;
-        }
-
-        return new static($dbVars['host'], $dbVars['name'], $dbVars['login'], $dbVars['password'], $options);
+        return new static($dbVars['host'], $dbVars['name'], $dbVars['login'], $dbVars['password'], $options, isset($dbVars['timezone']) ? $dbVars['timezone'] : null);
     }
 
     /**
