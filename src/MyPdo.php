@@ -65,7 +65,9 @@ class MyPdo extends PdoPlus {
     }
 
     function __destruct() {
-        --self::$connectionCount;
+        if(isset(self::$connectionCount)) { // this field might already have been cleaned up if there's another error
+            --self::$connectionCount;
+        }
     }
 
 
