@@ -15,8 +15,8 @@ class MyPdo extends PdoPlus {
     const INS_IGNORE = 8;
     const INS_REPLACE = 16;
 
-
     public static $connectionCount = 0;
+    private $_uuid;
 
     function __construct($host, $database_name=null, $username, $password, $options=[], $timezone=null) {
         $options = self::merge([
@@ -52,6 +52,7 @@ class MyPdo extends PdoPlus {
 
         try {
             parent::__construct($dsn, $username, $password, $options);
+            $this->_uuid = base64_encode(openssl_random_pseudo_bytes(16)); // TODO: use something simpler/faster
             ++self::$connectionCount;
         } catch(\PDOException $ex) {
             if($ex->getCode() === self::ER_ACCESS_DENIED_ERROR) {
@@ -62,6 +63,16 @@ class MyPdo extends PdoPlus {
             }
             throw $ex;
         }
+    }
+
+    /**
+     * Get a unique identifier for this PDO instance. IDs will not be re-used (like a GUID).
+     * The format of this ID is subject to change.
+     *
+     * @return string
+     */
+    public function getConnectionId() {
+        return $this->_uuid;
     }
 
     function __destruct() {
@@ -93,7 +104,7 @@ class MyPdo extends PdoPlus {
      * @deprecated Just use query()
      */
     public function emuQuery($sql, $params=[]) {
-        return $this->query((new Escaper($this))->format($sql, $params));
+        return $this->query($params ? (new Escaper($this))->format($sql, $params) : $sql);
     }
 
     private static function merge() {
