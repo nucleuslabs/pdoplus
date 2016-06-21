@@ -417,11 +417,24 @@ class MyPdo extends PdoPlus {
      * @return int Number of records updated
      */
     public function synchronize_table($table, $from_db, $to_db, $pk = null) {
-        if($pk === null) $pk = $from_db . '_id';
-        $pk_esc = self::quote_identifier($pk);
         $from_cols = $this->get_columns($from_db, $table);
         $to_cols = $this->get_columns($to_db, $table);
-        $columns = array_intersect($from_cols, $to_cols);
+        return $this->synchronize_table_columns($table, array_intersect($from_cols, $to_cols), $from_db, $to_db, $pk);
+    }
+
+    /**
+     * Updates a table with data from another database mfor specified columns, joining on the primary key. Can be used to sync the emr_client table with the PCS without inserting new records.
+     *
+     * @param string $table Table name
+     * @param string[] $columns
+     * @param  string $from_db From database name
+     * @param   string $to_db To database name
+     * @param string $pk Primary key field name
+     * @return int Number of records updated
+     */
+    public function synchronize_table_columns($table, $columns, $from_db, $to_db, $pk = null) {
+        if($pk === null) $pk = $table . '_id';
+        $pk_esc = self::quote_identifier($pk);
         $from_db_esc = self::quote_identifier($from_db);
         $to_db_esc = self::quote_identifier($to_db);
         $tbl_esc = self::quote_identifier($table);
