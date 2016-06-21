@@ -423,7 +423,7 @@ class MyPdo extends PdoPlus {
     }
 
     /**
-     * Updates a table with data from another database for specified columns, joining on the primary key. Can be used to sync the emr_client table with the PCS without inserting new records.
+     * Updates a table with data from another database for specified columns,  joining on the primary key. Can be used to sync the emr_client table with the PCS without inserting new records.
      *
      * @param string $table Table name
      * @param string[] $columns
