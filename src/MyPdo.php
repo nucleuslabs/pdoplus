@@ -33,7 +33,7 @@ class MyPdo extends PdoPlus {
             'charset' => 'utf8mb4', // charset requires PHP >= 5.3.6; see http://php.net/manual/en/ref.pdo-mysql.connection.php
         ];
 
-        if(strlen($port) && $port != 3306) {
+        if($port && $port != 3306) {
             $dsn_params['port'] = $port;
         }
 
