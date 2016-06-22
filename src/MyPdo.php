@@ -14,11 +14,12 @@ class MyPdo extends PdoPlus {
     const INS_HIGH_PRIORITY = 4;
     const INS_IGNORE = 8;
     const INS_REPLACE = 16;
+    const DEFAULT_PORT = 3306;
 
     public static $connectionCount = 0;
     private $_uuid;
 
-    function __construct($host, $database_name=null, $username, $password, $options=[], $timezone=null, $port=3306) {
+    function __construct($host, $database_name=null, $username, $password, $options=[], $timezone=null, $port=self::DEFAULT_PORT) {
         $options = self::merge([
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -33,7 +34,7 @@ class MyPdo extends PdoPlus {
             'charset' => 'utf8mb4', // charset requires PHP >= 5.3.6; see http://php.net/manual/en/ref.pdo-mysql.connection.php
         ];
 
-        if($port && $port != 3306) {
+        if($port && $port != self::DEFAULT_PORT) {
             $dsn_params['port'] = $port;
         }
 
