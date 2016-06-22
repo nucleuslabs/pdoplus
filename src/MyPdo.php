@@ -18,7 +18,7 @@ class MyPdo extends PdoPlus {
     public static $connectionCount = 0;
     private $_uuid;
 
-    function __construct($host, $database_name=null, $username, $password, $options=[], $timezone=null) {
+    function __construct($host, $database_name=null, $username, $password, $options=[], $timezone=null, $port=3306) {
         $options = self::merge([
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -32,6 +32,10 @@ class MyPdo extends PdoPlus {
             'dbname' => $database_name,
             'charset' => 'utf8mb4', // charset requires PHP >= 5.3.6; see http://php.net/manual/en/ref.pdo-mysql.connection.php
         ];
+
+        if(strlen($port) && $port != 3306) {
+            $dsn_params['port'] = $port;
+        }
 
         $dsn_filtered = [];
         foreach($dsn_params as $k=>$v) {
