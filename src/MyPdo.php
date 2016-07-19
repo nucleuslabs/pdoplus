@@ -47,16 +47,12 @@ class MyPdo extends PdoPlus {
 
         $dsn = 'mysql:'.implode(';',$dsn_filtered);
 
-        if(strlen($timezone)) {
-            $initCommand = (new Escaper())->format('SET SESSION time_zone=?', [$timezone]);
-            if(!empty($options[PDO::MYSQL_ATTR_INIT_COMMAND])) {
-                $initCommand .= ';'.$options[PDO::MYSQL_ATTR_INIT_COMMAND];
-            }
-            $options[PDO::MYSQL_ATTR_INIT_COMMAND] = $initCommand;
-        }
-
         try {
             parent::__construct($dsn, $username, $password, $options);
+            if(strlen($timezone)) {
+                $stmt = (new Escaper())->format('SET SESSION time_zone=?', [$timezone]);
+                $this->exec($stmt);
+            }
             $this->_uuid = base64_encode(openssl_random_pseudo_bytes(16)); // TODO: use something simpler/faster
             ++self::$connectionCount;
         } catch(\PDOException $ex) {
