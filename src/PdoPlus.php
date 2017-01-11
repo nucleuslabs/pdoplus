@@ -120,8 +120,8 @@ abstract class PdoPlus extends PDO {
     }
 
     public static function rethrow($pdo=null, \PDOException $e, $sql) {
-        $code = $e->errorInfo[1]?:$e->getCode();
-        $message = $e->errorInfo[2]?:$e->getMessage();
+        $code = !empty($e->errorInfo[1]) ? $e->errorInfo[1] : $e->getCode();
+        $message = !empty($e->errorInfo[2]) ? $e->errorInfo[2] : $e->getMessage();
         switch($code) {
             case MyPdo::ER_DUP_ENTRY:
                 throw new DuplicateEntryException($message . "\nSQL: " . $sql, $code);
