@@ -481,6 +481,13 @@ class MyPdo extends PdoPlus {
         return $this->exec($sql);
     }
 
+    public function drop_view($view, $if_exists) {
+        $sql = 'DROP VIEW ';
+        if($if_exists) $sql .= 'IF EXISTS ';
+        $sql .= self::quote_identifier($view);
+        return $this->exec($sql);
+    }
+
     public function drop_trigger($trigger, $if_exists) {
         $sql = 'DROP TRIGGER ';
         if($if_exists) $sql .= 'IF EXISTS ';
