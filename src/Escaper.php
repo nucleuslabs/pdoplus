@@ -108,33 +108,43 @@ class Escaper {
             return $query;
         }
 
-        $patt = '~(?|
-            ([\'"`])                        # capture this quote character
-            (?:\\\\.|(?!\1).)*+             # any escaped character, or any character that isn\'t the captured one
-            \1                              # the captured quote again
-            (*SKIP)(*FAIL)                  # ignore this
-            |
-            (\?\??)                         # one or two question marks
-            |
-            (::?)(\w+)                      # word characters marked with one or two colons
-        )~x';
+        $patt = '~
+            [`\'"?:]
+            (?:
+                (?<=`) [^`\\\\]*+ (?s:\\\\.[^`\\\\]*|``[^`\\\\]*)*+ `
+                (*SKIP) (*F)
+              |
+                (?<=\') [^\'\\\\]*+ (?s:\\\\.[^\'\\\\]*|\'\'[^\'\\\\]*)*+ \'
+                (*SKIP) (*F)
+              |
+                (?<=") [^"\\\\]*+ (?s:\\\\.[^"\\\\]*|""[^"\\\\]*)*+ "
+                (*SKIP) (*F)
+              |
+                (?<=\?) \??
+              |
+                (?<=:) :?
+                ([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)
+            )
+        ~x';
 
         $result = preg_replace_callback($patt, function ($matches) use (&$params) {
-            switch($matches[1]) {
-                case '?':
-                    if(!$params) throw new \DomainException("Not enough params");
-                    return $this->quote(array_shift($params));
-                case '??':
-                    if(!$params) throw new \DomainException("Not enough params");
+            if($matches[0] === '?') {
+                if(!$params) {
+                    throw new \DomainException("Not enough params");
+                }
+                if(strlen($matches[0]) === 2) {
                     return $this->escapeId(array_shift($params));
-                case ':':
-                    if(!array_key_exists($matches[2],$params)) throw new \DomainException("\"$matches[2]\" param not provided");
-                    return $this->quote($params[$matches[2]]);
-                case '::':
-                    if(!array_key_exists($matches[2],$params)) throw new \DomainException("\"$matches[2]\" param not provided");
-                    return $this->escapeId($params[$matches[2]]);
+                }
+                return $this->quote(array_shift($params));
+            } else {
+                if(!array_key_exists($matches[1],$params)) {
+                    throw new \DomainException("\"$matches[1]\" param not provided");
+                }
+                if(substr($matches[0],0,2) === '::') {
+                    return $this->escapeId($params[$matches[1]]);
+                }
+                return $this->quote($params[$matches[1]]);
             }
-            throw new \Exception("Bad regex");
         }, $query);
 
         if($result === null) {
