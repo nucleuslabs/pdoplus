@@ -108,19 +108,18 @@ class Escaper {
             return $query;
         }
 
-        $patt = '~
+        $patt = '~(?|
             ([\'"`])                        # capture this quote character
             (?:\\\\.|(?!\1).)*+             # any escaped character, or any character that isn\'t the captured one
             \1                              # the captured quote again
             (*SKIP)(*FAIL)                  # ignore this
             |
-            \?\??                           # one or two question marks
+            (\?\??)                         # one or two question marks
             |
-            ::?\w+                          # word characters marked with one or two colons
-        ~x';
+            (::?)(\w+)                      # word characters marked with one or two colons
+        )~x';
 
         $result = preg_replace_callback($patt, function ($matches) use (&$params) {
-            if(!isset($matches[1])) return $matches[0];
             switch($matches[1]) {
                 case '?':
                     if(!$params) throw new \DomainException("Not enough params");
