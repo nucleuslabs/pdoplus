@@ -88,13 +88,31 @@ class PdoPlusStatement extends PDOStatement {
         }
         if($fetch_style === PDO::FETCH_BOTH) {
             $args = array_slice(func_get_args(),1);
-            $row = parent::fetch(PDO::FETCH_ASSOC, ...$args);
+            $row = parent::fetch(PDO::FETCH_NAMED, ...$args);
             if($row === false) {
                 return $row;
             }
-            return array_replace(array_values($row),$row);
+            return self::named2both($row);
         }
         return parent::fetch(...func_get_args());
+    }
+
+    private static function named2both($row) {
+        $i = 0;
+        $result = [];
+        foreach($row as $k => $v) {
+            if(is_array($v)) {
+                foreach($v as $v2) {
+                    $result[$i++] = $v2;
+                }
+                /** @noinspection PhpUndefinedVariableInspection */
+                $result[$k] = $v2;
+            } else {
+                $result[$i++] = $v;
+                $result[$k] = $v;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -109,14 +127,11 @@ class PdoPlusStatement extends PDOStatement {
     public function fetchAll($fetch_style = NULL, $fetch_argument = NULL, $ctor_args = NULL) {
         if($fetch_style === PDO::FETCH_BOTH) {
             $args = array_slice(func_get_args(),1);
-            $result = parent::fetchAll(PDO::FETCH_ASSOC, ...$args);
+            $result = parent::fetchAll(PDO::FETCH_NAMED, ...$args);
             if($result === false) {
                 return $result;
             }
-            foreach($result as &$row) {
-                $row = array_replace(array_values($row),$row);
-            } unset($row);
-            return $result;
+            return array_map('self::named2both',$result);
         }
         return parent::fetchAll(...func_get_args());
     }
