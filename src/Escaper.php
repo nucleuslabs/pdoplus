@@ -103,8 +103,23 @@ class Escaper {
         return $forbidQualified ? $ret : str_replace('.', '`.`', $ret);
     }
 
-    public function format($query, $params = []) {
-        return preg_replace_callback('~(?|`(?:[^`\\\\]|\\\\.|``)*`|\'(?:[^\'\\\\]|\\\\.|\'\')*\'|"(?:[^"\\\\]|\\\\.|"")*"|(\?{1,2})|(:{1,2})([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*))~', function ($matches) use (&$params) {
+    public function format($query, $params = null) {
+        if($params === null) {
+            return $query;
+        }
+
+        $patt = '~
+            ([\'"`])                        # capture this quote character
+            (?:\\\\.|(?!\1).)*+             # any escaped character, or any character that isn\'t the captured one
+            \1                              # the captured quote again
+            (*SKIP)(*FAIL)                  # ignore this
+            |
+            \?\??                           # one or two question marks
+            |
+            ::?\w+                          # word characters marked with one or two colons
+        ~x';
+
+        $result = preg_replace_callback($patt, function ($matches) use (&$params) {
             if(!isset($matches[1])) return $matches[0];
             switch($matches[1]) {
                 case '?':
@@ -122,7 +137,27 @@ class Escaper {
             }
             throw new \Exception("Bad regex");
         }, $query);
+
+        if($result === null) {
+            $errorCode = preg_last_error();
+            if(isset(self::$pregErrors[$errorCode])) {
+                $errorCode = self::$pregErrors[$errorCode];
+            }
+            throw new \Exception("preg error: $errorCode");
+        }
+
+        return $result;
     }
+
+    private static $pregErrors = [
+        PREG_NO_ERROR => 'PREG_NO_ERROR',
+        PREG_INTERNAL_ERROR => 'PREG_INTERNAL_ERROR',
+        PREG_BACKTRACK_LIMIT_ERROR => 'PREG_BACKTRACK_LIMIT_ERROR',
+        PREG_RECURSION_LIMIT_ERROR => 'PREG_RECURSION_LIMIT_ERROR',
+        PREG_BAD_UTF8_ERROR => 'PREG_BAD_UTF8_ERROR',
+        PREG_BAD_UTF8_OFFSET_ERROR => 'PREG_BAD_UTF8_OFFSET_ERROR',
+        PREG_JIT_STACKLIMIT_ERROR => 'PREG_JIT_STACKLIMIT_ERROR',
+    ];
 
     public static function datetime($timestamp = null) {
         if($timestamp === null) $timestamp = time();
