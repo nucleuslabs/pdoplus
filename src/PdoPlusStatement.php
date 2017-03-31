@@ -5,7 +5,8 @@ use PDOException;
 use PDOStatement;
 
 class PdoPlusStatement extends PDOStatement {
-
+    protected $rowNumber = 0;
+    
     protected function __construct() {
     }
 
@@ -69,18 +70,29 @@ class PdoPlusStatement extends PDOStatement {
      * @param int $fetch_style
      * @param int $cursor_orientation
      * @param int $offset
-     * @return array|object|false
+     * @return array|false|object
+     * @throws \Exception
      * @see http://php.net/manual/en/pdostatement.fetch.php
      */
     public function fetch($fetch_style = NULL, $cursor_orientation = NULL, $offset = NULL) {
+        if($cursor_orientation === PDO::FETCH_ORI_ABS && $offset !== null && $offset !== $this->rowNumber) {
+            // https://bugs.php.net/bug.php?id=63466
+            if($this->rowNumber > $offset) {
+                throw new \Exception("Cannot move cursor backwards (from $this->rowNumber to $offset)");
+            }
+            while(++$this->rowNumber < $offset) {
+                parent::fetch(PDO::FETCH_NUM);
+            }
+        } else {
+            ++$this->rowNumber;
+        }
         if($fetch_style === PDO::FETCH_BOTH) {
             $args = array_slice(func_get_args(),1);
             $row = parent::fetch(PDO::FETCH_ASSOC, ...$args);
             if($row === false) {
                 return $row;
             }
-            $row = array_replace(array_values($row),$row);
-            return $row;
+            return array_replace(array_values($row),$row);
         }
         return parent::fetch(...func_get_args());
     }
