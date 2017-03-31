@@ -155,7 +155,7 @@ class Escaper {
         PREG_RECURSION_LIMIT_ERROR => 'PREG_RECURSION_LIMIT_ERROR',
         PREG_BAD_UTF8_ERROR => 'PREG_BAD_UTF8_ERROR',
         PREG_BAD_UTF8_OFFSET_ERROR => 'PREG_BAD_UTF8_OFFSET_ERROR',
-        PREG_JIT_STACKLIMIT_ERROR => 'PREG_JIT_STACKLIMIT_ERROR',
+        6 => 'PREG_JIT_STACKLIMIT_ERROR',
     ];
 
     public static function datetime($timestamp = null) {
