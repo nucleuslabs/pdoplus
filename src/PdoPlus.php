@@ -164,7 +164,7 @@ abstract class PdoPlus extends PDO {
      * @param array $params An array of values with as many elements as there are bound parameters in the SQL statement being executed.
      * @return PdoPlusStatement
      */
-    public function query($sql, $params=[]) {
+    public function query($sql, $params=null) {
         $escaper = new Escaper($this);
         $stmt = $escaper->format($sql, $params);
         try {
@@ -181,7 +181,7 @@ abstract class PdoPlus extends PDO {
      * @param array $params An array of values with as many elements as there are bound parameters in the SQL statement being executed.
      * @return int
      */
-    public function exec($sql, $params=[]) {
+    public function exec($sql, $params=null) {
         $escaper = new Escaper($this);
         $stmt = $escaper->format($sql, $params);
         try {
