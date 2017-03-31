@@ -128,7 +128,7 @@ class Escaper {
         ~x';
 
         $result = preg_replace_callback($patt, function ($matches) use (&$params) {
-            if($matches[0] === '?') {
+            if($matches[0][0] === '?') {
                 if(!$params) {
                     throw new \DomainException("Not enough params");
                 }
