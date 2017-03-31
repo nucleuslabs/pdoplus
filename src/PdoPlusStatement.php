@@ -80,7 +80,7 @@ class PdoPlusStatement extends PDOStatement {
             if($this->rowNumber > $offset) {
                 throw new \Exception("Cannot move cursor backwards (from $this->rowNumber to $offset)");
             }
-            while(++$this->rowNumber < $offset) {
+            while($this->rowNumber++ < $offset) {
                 parent::fetch(PDO::FETCH_NUM);
             }
         } else {
