@@ -62,5 +62,51 @@ class PdoPlusStatement extends PDOStatement {
         }
         return preg_replace($keys, $params, $this->queryString, 1, $count);
     }
+
+    /**
+     * Fetches the next row from a result set
+     *
+     * @param int $fetch_style
+     * @param int $cursor_orientation
+     * @param int $offset
+     * @return array|object|false
+     * @see http://php.net/manual/en/pdostatement.fetch.php
+     */
+    public function fetch($fetch_style = NULL, $cursor_orientation = NULL, $offset = NULL) {
+        if($fetch_style === PDO::FETCH_BOTH) {
+            $args = array_slice(func_get_args(),1);
+            $row = parent::fetch(PDO::FETCH_ASSOC, ...$args);
+            if($row === false) {
+                return $row;
+            }
+            $row = array_replace(array_values($row),$row);
+            return $row;
+        }
+        return parent::fetch(...func_get_args());
+    }
+
+    /**
+     * Returns an array containing all of the result set rows
+     *
+     * @param int $fetch_style
+     * @param string $fetch_argument
+     * @param int $ctor_args
+     * @return array|object|false
+     * @see http://php.net/manual/en/pdostatement.fetchall.php
+     */
+    public function fetchAll($fetch_style = NULL, $fetch_argument = NULL, $ctor_args = NULL) {
+        if($fetch_style === PDO::FETCH_BOTH) {
+            $args = array_slice(func_get_args(),1);
+            $result = parent::fetchAll(PDO::FETCH_ASSOC, ...$args);
+            if($result === false) {
+                return $result;
+            }
+            foreach($result as &$row) {
+                $row = array_replace(array_values($row),$row);
+            } unset($row);
+            return $result;
+        }
+        return parent::fetchAll(...func_get_args());
+    }
 }
 
