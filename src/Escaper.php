@@ -56,9 +56,9 @@ class Escaper {
                 // WARNING: this is not safe if NO_BACKSLASH_ESCAPES is enabled or if the server character set is one of big5, cp932, gb2312, bgk or sjis; see http://stackoverflow.com/a/12118602/65387 for details
                 return "'" . str_replace(["'", '\\', "\0", "\t", "\n", "\r", "\x08", "\x1a"], ["''", '\\\\', '\\0', '\\t', '\\n', '\\r', '\\b', '\\Z'], $value) . "'";
             }
-            throw new \Exception('conn', 'PDO|mysqli');
+            throw new \Exception("Could not quote \$value; unsupported connection: ".get_class($value));
         }
-        throw new \Exception('value', 'string');
+        throw new \Exception("Could not quote \$value; unsupported type: ".gettype($value));
     }
 
     /**
