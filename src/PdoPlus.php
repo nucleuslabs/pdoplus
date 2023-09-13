@@ -159,12 +159,16 @@ abstract class PdoPlus extends PDO {
 
     /**
      * Executes an SQL statement in a single function call, returning the result set (if any). All parameters are escaped client-side.
-     *
-     * @param string $sql An array of values with as many elements as there are bound parameters in the SQL statement being executed.
-     * @param array $params An array of values with as many elements as there are bound parameters in the SQL statement being executed.
+     * @param ...$args - Intended to take the following two values: 
+     * $args[0]: string $sql An array of values with as many elements as there are bound parameters in the SQL statement being executed.
+     * $args[1]: $params An array of values with as many elements as there are bound parameters in the SQL statement being executed.
+     * Moving to PHP8.0 required this function signature to agree with the parent's signature, but we have historically used this override 
+     * to emulate injecting escaped parameters into the sql. Thus the $...args workaround, which at least matches the parent's signature. 
      * @return PdoPlusStatement
      */
-    public function query($sql, $params=null) {
+    public function query(...$args) {
+        $sql = $args[0];
+        $params = count($args) > 1 ? $args[1] : null;
         $escaper = new Escaper($this);
         $stmt = $escaper->format($sql, $params);
         try {
