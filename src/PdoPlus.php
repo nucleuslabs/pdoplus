@@ -180,12 +180,14 @@ abstract class PdoPlus extends PDO {
 
     /**
      * Execute an SQL statement and return the number of affected rows. All parameters are escaped client-side.
-     *
-     * @param string $sql The SQL statement to prepare and execute.
-     * @param array $params An array of values with as many elements as there are bound parameters in the SQL statement being executed.
+     * @param ...$args - Intended to take the following two values:
+     * $args[0]: string $sql The SQL statement to prepare and execute.
+     * $args[1]: array $params An array of values with as many elements as there are bound parameters in the SQL statement being executed.
      * @return int
      */
-    public function exec($sql, $params=null) {
+    public function exec(...$args) {
+        $sql = $args[0];
+        $params = count($args) > 1 ? $args[1] : null;
         $escaper = new Escaper($this);
         $stmt = $escaper->format($sql, $params);
         try {
