@@ -19,7 +19,7 @@ class MyPdo extends PdoPlus {
     public static $connectionCount = 0;
     private $_uuid;
 
-    function __construct($host, $database_name=null, $username, $password, $options=[], $timezone=null, $port=self::DEFAULT_PORT) {
+    function __construct($host, $database_name, $username, $password, $options=[], $timezone=null, $port=self::DEFAULT_PORT) {
         $options = self::merge([
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -40,7 +40,7 @@ class MyPdo extends PdoPlus {
 
         $dsn_filtered = [];
         foreach($dsn_params as $k=>$v) {
-            if(strlen($v)) {
+            if(!empty($v) && strlen($v)) {
                 $dsn_filtered[] = "$k=$v";
             }
         }
@@ -466,6 +466,8 @@ class MyPdo extends PdoPlus {
 	 * @param null $parameter_type Provides a data type hint for drivers that have alternate quoting styles. Not used.
      * @return string Returns a quoted string that is theoretically safe to pass into an SQL statement.
      */
+    
+    #[\ReturnTypeWillChange] 
     public function quote($value, $parameter_type=null) {
         if(is_null($value)) return 'NULL';
         elseif(is_bool($value)) return $value ? 'TRUE' : 'FALSE';

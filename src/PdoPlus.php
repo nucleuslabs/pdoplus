@@ -119,7 +119,7 @@ abstract class PdoPlus extends PDO {
         return $this->query("SHOW FULL TABLES WHERE Table_type='BASE TABLE'")->fetchAll(PDO::FETCH_COLUMN);
     }
 
-    public static function rethrow($pdo=null, \PDOException $e, $sql) {
+    public static function rethrow($pdo, \PDOException $e, $sql) {
         $code = isset($e->errorInfo[1]) ? $e->errorInfo[1] : $e->getCode();
         $message = isset($e->errorInfo[2]) ? $e->errorInfo[2] : $e->getMessage();
         switch($code) {
@@ -166,6 +166,7 @@ abstract class PdoPlus extends PDO {
      * to emulate injecting escaped parameters into the sql. Thus the $...args workaround, which at least matches the parent's signature. 
      * @return PdoPlusStatement
      */
+    #[\ReturnTypeWillChange]
     public function query(...$args) {
         $sql = $args[0];
         $params = count($args) > 1 ? $args[1] : null;
@@ -185,6 +186,7 @@ abstract class PdoPlus extends PDO {
      * $args[1]: array $params An array of values with as many elements as there are bound parameters in the SQL statement being executed.
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function exec(...$args) {
         $sql = $args[0];
         $params = count($args) > 1 ? $args[1] : null;

@@ -16,6 +16,7 @@ class PdoPlusStatement extends PDOStatement {
      * @throws PDOException
      * @return PdoPlusStatement
      */
+    #[\ReturnTypeWillChange]
     public function execute($input_parameters = null) {
         $args = func_get_args();
         $argc = func_num_args();
@@ -74,6 +75,8 @@ class PdoPlusStatement extends PDOStatement {
      * @throws \Exception
      * @see http://php.net/manual/en/pdostatement.fetch.php
      */
+    
+    #[\ReturnTypeWillChange]
     public function fetch($fetch_style = NULL, $cursor_orientation = NULL, $offset = NULL) {
         if($cursor_orientation === PDO::FETCH_ORI_ABS && $offset !== null && $offset !== $this->rowNumber) {
             // https://bugs.php.net/bug.php?id=63466
@@ -124,7 +127,7 @@ class PdoPlusStatement extends PDOStatement {
      * @return array|object|false
      * @see http://php.net/manual/en/pdostatement.fetchall.php
      */
-    public function fetchAll($fetch_style = NULL, $fetch_argument = NULL, $ctor_args = NULL) {
+    public function fetchAll($fetch_style = NULL, $fetch_argument = NULL, ...$ctor_args) {
         if($fetch_style === PDO::FETCH_BOTH) {
             $args = array_slice(func_get_args(),1);
             $result = parent::fetchAll(PDO::FETCH_NAMED, ...$args);
