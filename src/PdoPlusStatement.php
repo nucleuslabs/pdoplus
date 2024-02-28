@@ -127,6 +127,7 @@ class PdoPlusStatement extends PDOStatement {
      * @return array|object|false
      * @see http://php.net/manual/en/pdostatement.fetchall.php
      */
+    #[\ReturnTypeWillChange]
     public function fetchAll($fetch_style = NULL, $fetch_argument = NULL, ...$ctor_args) {
         if($fetch_style === PDO::FETCH_BOTH) {
             $args = array_slice(func_get_args(),1);
