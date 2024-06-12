@@ -91,7 +91,7 @@ class MyPdo extends PdoPlus {
      * @return MyPdo
      */
     public static function createFromDbVars(array $dbVars, array $options = []) {
-        return new static($dbVars['host'], $dbVars['name'], $dbVars['login'], $dbVars['password'], $options, isset($dbVars['timezone']) ? $dbVars['timezone'] : null);
+        return new static($dbVars['host'], $dbVars['name'], $dbVars['login'], $dbVars['password'], $options, $dbVars['timezone'] ?? null, $dbVars['port'] ?? self::DEFAULT_PORT);
     }
 
     /**
