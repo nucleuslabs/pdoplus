@@ -49,7 +49,7 @@ class MyPdo extends PdoPlus {
 
         try {
             parent::__construct($dsn, $username, $password, $options);
-            if(strlen($timezone)) {
+            if(!empty($timezone) && strlen($timezone)) {
                 $stmt = (new Escaper())->format('SET SESSION time_zone=?', [$timezone]);
                 $this->exec($stmt);
             }
@@ -57,7 +57,7 @@ class MyPdo extends PdoPlus {
             ++self::$connectionCount;
         } catch(\PDOException $ex) {
             if($ex->getCode() === self::ER_ACCESS_DENIED_ERROR) {
-                throw new AccessDeniedException("Access denied for user '$username' (using password: ".(strlen($password)?'YES':'NO')."). DSN: $dsn");
+                throw new AccessDeniedException("Access denied for user '$username' (using password: ".(!empty($password) && strlen($password)?'YES':'NO')."). DSN: $dsn");
             }
             if($ex->getCode() === self::ER_CON_COUNT_ERROR) {
                 throw new PdoPlusException("Too many connections: ".self::$connectionCount, $ex->getCode(), $ex);
@@ -152,7 +152,7 @@ class MyPdo extends PdoPlus {
 
     public function prepare_insert($table, $columns, $options = 0) {
         $table_sql = self::quote_identifier($table);
-        $column_sql = implode(', ', array_map(['self', 'quote_identifier'], $columns));
+        $column_sql = implode(', ', array_map(self::quote_identifier(...), $columns));
         $placeholder_arr = [];
         foreach($columns as $col) {
             $placeholder_arr[] = ":$col";

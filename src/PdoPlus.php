@@ -89,7 +89,7 @@ abstract class PdoPlus extends PDO {
      * @return bool
      */
 	public function column_exists($database, $table, $column) {
-        if(strlen($database)) {
+        if(!empty($database) && strlen($database)) {
             return (bool)$this->prepare('SELECT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=? AND TABLE_NAME=? AND COLUMN_NAME=?)')->execute([$database, $table, $column])->fetch(PDO::FETCH_COLUMN);
         } else {
             return (bool)$this->prepare('SELECT EXISTS(SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND COLUMN_NAME=?)')->execute([$table, $column])->fetch(PDO::FETCH_COLUMN);
