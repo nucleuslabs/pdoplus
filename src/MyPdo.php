@@ -367,7 +367,7 @@ class MyPdo extends PdoPlus {
     public function copy_table($table, $from_db, $to_db, $truncate = true, $where = null, $verb = "INSERT IGNORE") {
         $from_cols = $this->get_columns($from_db, $table);
         $to_cols = $this->get_columns($to_db, $table);
-        $columns = implode(',', array_map('self::quote_identifier', array_intersect($from_cols, $to_cols)));
+        $columns = implode(',', array_map(self::quote_identifier(...), array_intersect($from_cols, $to_cols)));
         $from_db_esc = self::quote_identifier($from_db);
         $to_db_esc = self::quote_identifier($to_db);
         $tbl_esc = self::quote_identifier($table);
