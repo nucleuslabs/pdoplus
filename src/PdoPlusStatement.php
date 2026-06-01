@@ -135,7 +135,7 @@ class PdoPlusStatement extends PDOStatement {
             if($result === false) {
                 return $result;
             }
-            return array_map('self::named2both',$result);
+            return array_map(self::named2both(...),$result);
         }
         return parent::fetchAll(...func_get_args());
     }
